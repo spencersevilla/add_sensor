@@ -3,7 +3,9 @@
 
 #define AF_ADD 1
 
-/* routing-layer specific */
+#include "kernel_includes.h"
+#include "mnet_includes.h"
+
 struct addhdr {
     __be16 family; /* MUST BE FIRST FIELD!!! */
     __be16 ones;   /* all ones for test here */

@@ -1,3 +1,5 @@
+#include "add_sendmsg.h"
+
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len)
 {
     struct addhdr *hdr;
@@ -24,11 +26,7 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
             printk(KERN_INFO "error: dev not found!\n");
             dev = (sock_net(sk))->loopback_dev;
         }
-        if (sm->id_no == 1) {
-            daddr = daddr1;
-        } else {
-            daddr = daddr2;
-        }
+        daddr = NULL;
     }
     
     /* build header */
@@ -40,7 +38,7 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
 
     /* send down the stack! */
     /* NOTE: dst must be set if you want to use an actual interface! */
-    return mhost_finish_output(skb, dev, daddr);
+    return mhost_send_to_l2(skb, dev, daddr);
 };
 
 int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 
@@ -58,6 +56,6 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
         printk(KERN_INFO "error: hdr->ones not all ones!\n");
     }
 
-    mhost_local_deliver(skb);
+    mhost_send_to_l4(skb);
     return 0;
 }
