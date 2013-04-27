@@ -1,16 +1,21 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/workqueue.h>
-#include <linux/sched.h> 
+#include <linux/sched.h>
+
+#include "add_includes.h"
+
+int add_init(void);
 
 int closing = 0;
-static void intrpt_routine(void *irrelevant);
+
+static void hello_timer(void *irrelevant);
 
 static struct delayed_work hello_timer_dw;
 static DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
 
-static struct delayed_work cleanup_module_dw;
-static DECLARE_DELAYED_WORK(cleanup_module_dw, add_cleanup);
+// static struct delayed_work cleanup_module_dw;
+// static DECLARE_DELAYED_WORK(cleanup_module_dw, add_cleanup);
 
 #define HELLO_INTERVAL (3*HZ)
 #define CLEANUP_INTERVAL (HELLO_INTERVAL + 1*HZ)
@@ -43,6 +48,7 @@ void cleanup_module(void) {
 
 int add_init() {
     schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);
+    return 0;
 }
 
 // int add_cleanup() {
