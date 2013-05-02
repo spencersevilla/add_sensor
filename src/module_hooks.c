@@ -5,20 +5,13 @@
 
 #include "add_includes.h"
 
-int add_init(void);
-
-int closing = 0;
+// static struct delayed_work cleanup_module_dw;
+// static DECLARE_DELAYED_WORK(cleanup_module_dw, add_cleanup);
 
 static void hello_timer(void *irrelevant);
 
 static struct delayed_work hello_timer_dw;
 static DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
-
-// static struct delayed_work cleanup_module_dw;
-// static DECLARE_DELAYED_WORK(cleanup_module_dw, add_cleanup);
-
-#define HELLO_INTERVAL (3*HZ)
-#define CLEANUP_INTERVAL (HELLO_INTERVAL + 1*HZ)
 
 /*******************************************************************************/
 int init_module(void) {
@@ -33,23 +26,20 @@ static void hello_timer(void *irrelevant) {
 
     add_generate_hello();
 
-    if (closing == 0) {
+    if (is_controller == 1) {
 		schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);
     }
 }
 
-
 void cleanup_module(void) {
     printk(KERN_INFO "removing add module");
-    closing = 1;
-    cancel_delayed_work(&hello_timer_dw);
+    if (is_controller == 1) {
+        is_controller = 0;
+        cancel_delayed_work(&hello_timer_dw);
+    }
     // schedule_delayed_work(&cleanup_module_dw, CLEANUP_INTERVAL);
 }
 
-int add_init() {
-    schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);
-    return 0;
-}
 
 // int add_cleanup() {
 
