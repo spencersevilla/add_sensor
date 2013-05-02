@@ -9,9 +9,8 @@
 // static DECLARE_DELAYED_WORK(cleanup_module_dw, add_cleanup);
 
 static void hello_timer(void *irrelevant);
-
-static struct delayed_work hello_timer_dw;
-static DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
+struct delayed_work hello_timer_dw;
+DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
 
 /*******************************************************************************/
 int init_module(void) {

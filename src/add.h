@@ -1,6 +1,8 @@
 #ifndef _add_h
 #define _add_h
 
+#include "kernel_includes.h"
+
 struct add_controller {
 	int id;
 	char next_hop[6];
@@ -19,6 +21,9 @@ struct addhdr {
     __be16 family; /* MUST BE FIRST FIELD!!! */
     __be16 ones;   /* all ones for test here */
 };
+
+extern int is_controller;
+extern struct delayed_work hello_timer_dw;
 
 int add_init(void);
 void * lookup_next_hop(int dst_id);

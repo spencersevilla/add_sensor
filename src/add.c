@@ -6,7 +6,7 @@ struct add_controller *controller_list_head;
 struct add_node *node_list_head;
 struct net_device *dev;
 
-int add_init() {
+int add_init(void) {
     /*  look through the devs. we NEED a wlan interface here! Currently I have
      *  no idea how to deal with multiple devs, so the plan is to get one and
      *  just stick with it completely. Not the best, but it'll do for now.
