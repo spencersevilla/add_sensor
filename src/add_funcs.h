@@ -21,4 +21,12 @@ void * lookup_next_hop(int dst_id);
 int local_controller_for_node(int node_id);
 void * next_hop_for_controller(int controller_id);
 
+/* add_tables.c */
+int insert_node_list(struct add_node *node);
+int remove_node_list(int node_id);
+struct add_node * node_from_list(int node_id);
+int insert_controller_list(struct add_controller *node);
+int remove_controller_list(int controller_id);
+struct add_controller * controller_from_list(int controller_id);
+
 #endif

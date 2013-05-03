@@ -1,10 +1,5 @@
 #include "add.h"
 
-int insert_node_list(struct add_node *node);
-int remove_node_list(int node_id);
-int insert_controller_list(struct add_controller *node);
-int remove_controller_list(int controller_id);
-
 int is_controller = 0;
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;
@@ -53,7 +48,7 @@ int add_init(void) {
  */
 void * lookup_next_hop(int dst_id) {
 	int controller_id = local_controller_for_node(dst_id);
-	if (controller_id == 0) {
+	if (controller_id == -1) {
 		return NULL;
 	}
 
@@ -62,166 +57,22 @@ void * lookup_next_hop(int dst_id) {
 
 /* this function translates a node_id to its local controller_id or 0 (failure) */
 int local_controller_for_node(int node_id) {
-	struct add_node *ptr = node_list_head;
+	struct add_node *node = node_from_list(node_id);
+    if (node == NULL) {
+        /* failure */
+        return -1;
+    }
 
-	while (ptr != NULL) {
-		if (ptr->id == node_id) {
-			return ptr->controller_id;
-		}
-		ptr = ptr->next;
-	}
-
-	/* failure */
-	return 0;
+    return node->controller_id;
 }
 
 /* this function translates a controller_id to its next-hop MAC or NULL */
 void * next_hop_for_controller(int controller_id) {
-	struct add_controller *ptr = controller_list_head;
-
-	while (ptr != NULL) {
-		if (ptr->id == controller_id) {
-			return ptr->next_hop;
-		}
-		ptr = ptr->next;
-	}
-
-	/* failure */
-	return NULL;
-}
-
-int insert_node_list(struct add_node *node) {
-    /* initialize list */
-    struct add_node *ptr, *nxt;
-    if (node_list_head == NULL) {
-        node_list_head = node;
-        node->next = NULL;
-        return 0;
+	struct add_controller *controller = controller_from_list(controller_id);
+    if (controller == NULL) {
+        /* failure */
+        return NULL;
     }
 
-    /* insert at front of list */
-    if (node->id < node_list_head->id) {
-        node->next = node_list_head;
-        node_list_head = node;
-        return 0;
-    }
-
-    /* now we can start iterating because we know that
-     * node->id is greater than ptr->id */
-    ptr = node_list_head;
-    nxt = node_list_head->next;
-    while(nxt != NULL) {
-        if (node->id < nxt->id) {
-            node->next = nxt;
-            ptr->next = node;
-            return 0;
-        }
-
-        ptr = nxt;
-        nxt = ptr->next;
-    }
-
-    /* IF we get here, it means that nxt == NULL and we
-     * never inserted node, so do it at the end of the list! */
-    ptr->next = node;
-    node->next = NULL;
-    return 0;
-}
-
-int remove_node_list(int node_id) {
-    struct add_node *ptr, *nxt;
-
-    /* list is empty, cannot remove anything from it */
-    if (node_list_head == NULL) {
-        return -1;
-    }
-
-    /* node is head of list */
-    if (node_list_head->id == node_id) {
-        node_list_head = node_list_head->next;
-        return 0;
-    }
-
-    ptr = node_list_head;
-    nxt = node_list_head->next;
-    while (nxt != NULL) {
-        if (nxt->id == node_id) {
-            ptr->next = nxt->next;
-            return 0;
-        }
-
-        ptr = nxt;
-        nxt = ptr->next;
-    }
-
-    /* got all the way to the end of the list without a match */
-    return -1;
-}
-
-int insert_controller_list(struct add_controller *node) {
-    /* initialize list */
-    struct add_controller *ptr, *nxt;
-    if (controller_list_head == NULL) {
-        controller_list_head = node;
-        node->next = NULL;
-        return 0;
-    }
-
-    /* insert at front of list */
-    if (node->id < controller_list_head->id) {
-        node->next = controller_list_head;
-        controller_list_head = node;
-        return 0;
-    }
-
-    /* now we can start iterating because we know that
-     * node->id is greater than ptr->id */
-    ptr = controller_list_head;
-    nxt = controller_list_head->next;
-    while(nxt != NULL) {
-        if (node->id < nxt->id) {
-            node->next = nxt;
-            ptr->next = node;
-            return 0;
-        }
-
-        ptr = nxt;
-        nxt = ptr->next;
-    }
-
-    /* IF we get here, it means that nxt == NULL and we
-     * never inserted node, so do it at the end of the list! */
-    ptr->next = node;
-    node->next = NULL;
-    return 0;
-}
-
-int remove_controller_list(int node_id) {
-    struct add_controller *ptr, *nxt;
-
-    /* list is empty, cannot remove anything from it */
-    if (controller_list_head == NULL) {
-        return -1;
-    }
-
-    /* node is head of list */
-    if (controller_list_head->id == node_id) {
-        controller_list_head = controller_list_head->next;
-        return 0;
-    }
-
-    ptr = controller_list_head;
-    nxt = controller_list_head->next;
-    while (nxt != NULL) {
-        if (nxt->id == node_id) {
-            ptr->next = nxt->next;
-            return 0;
-        }
-
-        ptr = nxt;
-        nxt = ptr->next;
-    }
-
-    /* got all the way to the end of the list without a match */
-    return -1;
+	return controller->next_hop;
 }
