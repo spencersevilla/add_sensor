@@ -1,5 +1,7 @@
 #include "add.h"
 
+int add_id = 1;
+
 int is_controller = 0;
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;

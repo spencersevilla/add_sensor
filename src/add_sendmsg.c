@@ -5,39 +5,40 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     struct addhdr *hdr;
     struct net_device *dev = NULL;
     char *daddr = NULL;
-    struct sockaddr_mhost *sm = (struct sockaddr_mhost *)sa;
+    int local_id = 0;
+    struct sockaddr_add *addr = (struct sockaddr_add *)sa;
     
     printk(KERN_INFO "add_mhost_sendmsg called\n");
     
     /* do routing work to find a device */
-    if (sm->sa_family != AF_ADD) {
-        printk(KERN_INFO "error: wrong sockaddr type!\n");
+    if (addr->sa_family != AF_ADD) {
+        printk(KERN_INFO "add error: wrong sockaddr type!\n");
         return -1;
     }
     
-    /* really intelligent routing! */
-    if (sm->id_no == 0) {
-        printk(KERN_INFO "id_no == 0\n");
-        dev = (sock_net(sk))->loopback_dev;
-        daddr = NULL;
-    } else {
-        dev = dev_get_by_index(sock_net(sk), 3);
-        if (!dev) {
-            printk(KERN_INFO "error: dev not found!\n");
-            dev = (sock_net(sk))->loopback_dev;
-        }
-        daddr = NULL;
+    if (dev == NULL) {
+        printk(KERN_INFO "add error: no wlan device!\n");
+        return -1;
     }
-    
+
+    /* routing logic here */
+    local_id = local_controller_for_node(addr->id);
+    daddr = lookup_next_hop(addr->id);
+
+    if (daddr == NULL) {
+        /* no entry, so ABORT for now... */
+        printk(KERN_INFO "add error: no route to id %d", addr->id);
+        return -1;
+    }
+
     /* build header */
     hdr = (struct addhdr *)skb_push(skb, sizeof(struct addhdr));
     hdr->family = AF_ADD;
-    hdr->ones = 0xFFFF;
+    hdr->pkt_type = ADD_TYPE_DATA;
+    hdr->dst_id = 0;
+    hdr->src_id = 0;
     
-    printk(KERN_INFO "sending to: [%p:%s]\n", dev, dev->name);
-
     /* send down the stack! */
-    /* NOTE: dst must be set if you want to use an actual interface! */
     return mhost_send_to_l2(skb, dev, daddr);
 };
 
@@ -52,10 +53,44 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
     skb_pull(skb, sizeof(struct addhdr));
     hdr = (struct addhdr *) skb_network_header(skb);
     
-    if (hdr->ones != 0xFFFF) {
-        printk(KERN_INFO "error: hdr->ones not all ones!\n");
+    // if (hdr->ones != 0xFFFF) {
+    //     printk(KERN_INFO "error: hdr->ones not all ones!\n");
+    // }
+    if (hdr->pkt_type == ADD_TYPE_DATA) {
+        return process_data_pkt(hdr, skb);
     }
 
-    mhost_send_to_l4(skb);
-    return 0;
+    /* we received a packet-type that we don't support... */
+    printk(KERN_INFO "add error: invalid pkt_type: %d", hdr->pkt_type);
+    return -1;
+}
+
+int process_data_pkt(struct addhdr *hdr, struct sk_buff *skb) {
+    printk(KERN_INFO "add: process_data_pkt called\n");
+
+    if (hdr->dst_id == add_id) {
+        /* we are the final destination, so send to L4! */
+        mhost_send_to_l4(skb);
+        return 0;
+    } else {
+        /* we must route it onwards... */
+        return route_packet(hdr, skb);
+    }
+}
+
+int route_packet(struct addhdr *hdr, struct sk_buff skb) {
+    char *daddr = NULL;
+
+    daddr = lookup_next_hop(hdr->dst_id);
+    if (daddr == NULL) {
+        printk(KERN_INFO, "add error: no next hop for dst_id %d", hdr->dst_id);
+        return -1;
+    }
+
+    /* NOTE that when we push we ALREADY have a pointer here, it's 
+     * just hdr and it's already built! Just put it back as-is! */
+    skb_push(skb, sizeof(struct addhdr));
+
+    /* send down the stack! */
+    return mhost_send_to_l2(skb, dev, daddr);
 }

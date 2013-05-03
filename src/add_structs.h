@@ -15,9 +15,18 @@ struct add_node {
 	struct add_node *next;
 };
 
+struct sockaddr_add {
+    short			sa_family;
+    unsigned short	port;
+    unsigned int	id;
+    char			blank[8];
+};
+
 struct addhdr {
     __be16 family; /* MUST BE FIRST FIELD!!! */
-    __be16 ones;   /* all ones for test here */
+    __be16 pkt_type;
+    __be32 dst_id;
+    __be32 src_id;
 };
 
 #endif
