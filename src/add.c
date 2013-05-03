@@ -12,7 +12,6 @@ int add_init(void) {
      *  no idea how to deal with multiple devs, so the plan is to get one and
      *  just stick with it completely. Not the best, but it'll do for now.
      */
-    struct add_node *node_ptr = NULL;
     struct net_device *ndev = NULL;
     dev = NULL;
 

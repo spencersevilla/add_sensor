@@ -78,12 +78,12 @@ int process_data_pkt(struct addhdr *hdr, struct sk_buff *skb) {
     }
 }
 
-int route_packet(struct addhdr *hdr, struct sk_buff skb) {
+int route_packet(struct addhdr *hdr, struct sk_buff *skb) {
     char *daddr = NULL;
 
     daddr = lookup_next_hop(hdr->dst_id);
     if (daddr == NULL) {
-        printk(KERN_INFO, "add error: no next hop for dst_id %d", hdr->dst_id);
+        printk(KERN_INFO "add error: no next hop for dst_id %d", hdr->dst_id);
         return -1;
     }
 
