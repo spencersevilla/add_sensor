@@ -1,5 +1,10 @@
 #include "add.h"
 
+int insert_node_list(struct add_node *node);
+int remove_node_list(int node_id);
+int insert_controller_list(struct add_controller *node);
+int remove_controller_list(int controller_id);
+
 int is_controller = 0;
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;
@@ -10,6 +15,7 @@ int add_init(void) {
      *  no idea how to deal with multiple devs, so the plan is to get one and
      *  just stick with it completely. Not the best, but it'll do for now.
      */
+    struct add_node *node_ptr = NULL;
     struct net_device *ndev = NULL;
     dev = NULL;
 
