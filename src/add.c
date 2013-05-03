@@ -10,17 +10,19 @@ int add_init(void) {
      *  no idea how to deal with multiple devs, so the plan is to get one and
      *  just stick with it completely. Not the best, but it'll do for now.
      */
+    struct net_device *ndev = NULL;
     dev = NULL;
 
     read_lock(&dev_base_lock);
-    struct net_device *ndev = first_net_device(&init_net);
-    while (ndev) {
-    	if (ndev->name[0] == 'w') {
-            printk(KERN_INFO, "found device: %s", ndev->name);
+    ndev = first_net_device(&init_net);
+    while (ndev != NULL) {
+        char *n = ndev->name;
+    	if (n[0] == 'e') {
+            printk(KERN_INFO "found device: %s", ndev->name);
     		dev = ndev;
     		break;
     	}
-        ndev = next_net_device(dev);
+        ndev = next_net_device(ndev);
     }
     read_unlock(&dev_base_lock);
 
@@ -121,7 +123,7 @@ int insert_node_list(struct add_node *node) {
 }
 
 int remove_node_list(int node_id) {
-    struct add_node *ptr, nxt;
+    struct add_node *ptr, *nxt;
 
     /* list is empty, cannot remove anything from it */
     if (node_list_head == NULL) {
@@ -189,7 +191,7 @@ int insert_controller_list(struct add_controller *node) {
 }
 
 int remove_controller_list(int node_id) {
-    struct add_controller *ptr, nxt;
+    struct add_controller *ptr, *nxt;
 
     /* list is empty, cannot remove anything from it */
     if (controller_list_head == NULL) {
