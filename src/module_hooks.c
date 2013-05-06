@@ -14,7 +14,7 @@ DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
 static int closing = 0;
 
 module_param(add_id, int, 0000);
-MODULE_PARAM_DESC(add_id, "ADD unique routing ID");
+MODULE_PARM_DESC(add_id, "ADD unique routing ID");
 
 /*******************************************************************************/
 int init_module(void) {

@@ -4,7 +4,6 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
 {
     struct add_data_hdr *hdr;
     struct net_device *dev = NULL;
-    char *daddr = NULL;
     int controller_id = 0;
     struct sockaddr_add *addr = (struct sockaddr_add *)sa;
     
@@ -75,7 +74,7 @@ int process_data_pkt(struct sk_buff *skb) {
     if (hdr->dst_id == add_id) {
         /* We are the final destination, so send to L4! 
          * Note that NOW we finally skb_pull the header. */
-        skb_pull(skb, sizeof(struct addhdr));
+        skb_pull(skb, sizeof(struct add_data_hdr));
         mhost_send_to_l4(skb);
         return 0;
     } else {
