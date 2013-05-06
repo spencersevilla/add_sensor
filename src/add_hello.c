@@ -1,12 +1,12 @@
 #include "add_hello.h"
 
 int add_generate_hello() {
-   struct sk_buff *skb;
+   // struct sk_buff *skb;
 
-   skb = alloc_skb(MHOST_MAX_HEADER + ADD_HELLO_SIZE, sk->sk_allocation);
-   if (unlikely(skb == NULL))
-       return -ENOBUFS;
-   skb_reserve(skb, MHOST_MAX_HEADER);
+   // skb = alloc_skb(MHOST_MAX_HEADER + ADD_HELLO_SIZE, sk->sk_allocation);
+   // if (unlikely(skb == NULL))
+   //     return -ENOBUFS;
+   // skb_reserve(skb, MHOST_MAX_HEADER);
     
     /* copy payload from userspace */
 //    data = skb_put(skb, len);
@@ -23,7 +23,7 @@ int add_receive_hello(struct sk_buff *skb) {
 
   int i = 0;
   printk(KERN_INFO "add: add_receive_hello called\n");
-  hdr = skb_pull(skb, sizeof(struct add_hello_hdr));
+  hdr = (struct add_hello_hdr *) skb_pull(skb, sizeof(struct add_hello_hdr));
 
   /* first, update neighbor table to reflect that the
    * node sending this message is a 1-hop neighbor! */
@@ -33,7 +33,7 @@ int add_receive_hello(struct sk_buff *skb) {
     src = kmalloc( sizeof(struct add_neighbor), GFP_KERNEL);
     src->id = hdr->src_id;
     src->hops = 1;
-    src->daddr = NULL;
+    memset(src->daddr, 0, 6);
     insert_neighbor_list(src);
   } else {
     /* now it's one hop away, even if it used to be 2! */
@@ -43,7 +43,7 @@ int add_receive_hello(struct sk_buff *skb) {
   /* next, go through this node's controller-list
    * and update our own controller-list as necessary. */
   for (i = 0; i < hdr->clist; i++) {
-    controller = skb_pull(skb, sizeof(struct add_clist_entry));
+    controller = (struct add_clist_entry *) skb_pull(skb, sizeof(struct add_clist_entry));
     c = controller_from_list(controller->id);
     if (c == NULL) {
       /* this is a new controller we've never seen before!!! */

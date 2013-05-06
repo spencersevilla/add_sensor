@@ -35,8 +35,8 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     hdr = (struct addhdr *)skb_push(skb, sizeof(struct addhdr));
     hdr->family = AF_ADD;
     hdr->pkt_type = ADD_TYPE_DATA;
-    hdr->dst_id = 0;
-    hdr->src_id = 0;
+    // hdr->dst_id = 0;
+    // hdr->src_id = 0;
     
     /* send down the stack! */
     return mhost_send_to_l2(skb, dev, daddr);
@@ -70,7 +70,7 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
 int process_data_pkt(struct sk_buff *skb) {
     struct add_data_hdr *hdr = NULL;
     printk(KERN_INFO "add: process_data_pkt called\n");
-    hdr = skb_pull(skb, sizeof(struct add_data_hdr));
+    hdr = (struct add_data_hdr *) skb_pull(skb, sizeof(struct add_data_hdr));
 
     if (hdr->dst_id == add_id) {
         /* we are the final destination, so send to L4! */

@@ -7,6 +7,7 @@ struct add_neighbor {
     int id;
     int hops;       /* 1 or 2 */
     char daddr[6];  /* next-hop MAC */
+    struct add_neighbor *next;
 };
 
 struct add_controller {
@@ -44,7 +45,7 @@ struct add_data_hdr {
 
 struct add_hello_hdr {
     __be32 src_id;
-    char[6] mac;
+    char mac[6];
     __be32 seqno;
     __be16 clist;
     __be16 nlist;
