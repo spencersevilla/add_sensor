@@ -6,9 +6,10 @@ int num_nodes = 0;
 
 int insert_node_list(struct add_node *node) {
     /* initialize list */
+    struct add_node *ptr, *nxt;
+
     num_nodes++;
 
-    struct add_node *ptr, *nxt;
     if (node_list_head == NULL) {
         node_list_head = node;
         node->next = NULL;
@@ -108,9 +109,10 @@ struct add_node * node_from_list(int node_id) {
 
 int insert_controller_list(struct add_controller *node) {
     /* initialize list */
+    struct add_controller *ptr, *nxt;
+
     num_controllers++;
 
-    struct add_controller *ptr, *nxt;
     if (controller_list_head == NULL) {
         controller_list_head = node;
         node->next = NULL;
@@ -210,8 +212,10 @@ struct add_controller * controller_from_list(int controller_id) {
 
 int insert_neighbor_list(struct add_neighbor *node) {
     /* initialize list */
-    num_neighbors++;
     struct add_neighbor *ptr, *nxt;
+
+    num_neighbors++;
+
     if (neighbor_list_head == NULL) {
         neighbor_list_head = node;
         node->next = NULL;

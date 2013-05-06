@@ -33,6 +33,11 @@ struct sockaddr_add {
 
 /* structs for use in packet-headers */
 
+struct add_hdr_info {
+    __be16 family;      /* MUST BE FIRST FIELD!!! */
+    __be16 pkt_type;
+};
+
 struct add_data_hdr {
     __be16 family;      /* MUST BE FIRST FIELD!!! */
     __be16 pkt_type;

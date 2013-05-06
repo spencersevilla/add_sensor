@@ -45,13 +45,13 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
 int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 
                    struct net_device *orig_dev)
 {
-    struct addhdr *hdr;
+    struct add_hdr_info *hdr;
     
     printk(KERN_INFO "add_mhost_rcv called\n");
     
     /* preserve network_header location */
-    skb_pull(skb, sizeof(struct addhdr));
-    hdr = (struct addhdr *) skb_network_header(skb);
+    // skb_pull(skb, sizeof(struct addhdr));
+    hdr = (struct add_hdr_info *) skb_network_header(skb);
     
     // if (hdr->ones != 0xFFFF) {
     //     printk(KERN_INFO "error: hdr->ones not all ones!\n");
@@ -94,7 +94,6 @@ int route_packet(struct add_data_hdr *hdr, struct sk_buff *skb) {
     /* NOTE that when we push we ALREADY have a pointer here, it's 
      * just hdr and it's already built! Just put it back as-is! */
     skb_push(skb, sizeof(struct add_data_hdr));
-    skb_push(skb, sizeof(struct addhdr));
 
     /* send down the stack! */
     return mhost_send_to_l2(skb, dev, daddr);

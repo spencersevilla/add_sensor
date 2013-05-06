@@ -22,12 +22,12 @@ int add_generate_hello() {
   len += (hdr.clist * sizeof(struct add_clist_entry));
   len += (hdr.nlist * sizeof(struct add_nlist_entry));
 
-  skb = alloc_skb(MHOST_MAX_HEADER + len, GFP_KERNEL);
+  skb = alloc_skb(LL_MAX_HEADER + len, GFP_KERNEL);
   if (unlikely(skb == NULL)) {
     return -ENOBUFS;
   }
 
-  skb_reserve(skb, MHOST_MAX_HEADER);
+  skb_reserve(skb, LL_MAX_HEADER);
     
   /* copy static header information */
   data = skb_put(skb, len);
@@ -39,8 +39,8 @@ int add_generate_hello() {
   c = controller_list_head;
   while (c != NULL) {
     struct add_clist_entry entry;
-    entry.id = c.id;
-    entry.hops = c.hops;
+    entry.id = c->id;
+    entry.hops = c->hops;
 
     memcpy(data, &entry, sizeof(struct add_clist_entry));
     data = data + sizeof(struct add_clist_entry);
@@ -51,7 +51,7 @@ int add_generate_hello() {
   n = neighbor_list_head;
   while (n != NULL) {
     struct add_nlist_entry entry;
-    entry.id = n.id;
+    entry.id = n->id;
 
     memcpy(data, &entry, sizeof(struct add_nlist_entry));
     data = data + sizeof(struct add_nlist_entry);
