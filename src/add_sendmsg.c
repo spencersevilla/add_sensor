@@ -57,7 +57,9 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
     //     printk(KERN_INFO "error: hdr->ones not all ones!\n");
     // }
     if (hdr->pkt_type == ADD_TYPE_DATA) {
-        return process_data_pkt(hdr, skb);
+        return process_data_pkt(skb);
+    } else if (hdr->pkt_type == ADD_TYPE_HELLO) {
+        return add_receive_hello(skb);
     }
 
     /* we received a packet-type that we don't support... */
@@ -65,8 +67,10 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
     return -1;
 }
 
-int process_data_pkt(struct addhdr *hdr, struct sk_buff *skb) {
+int process_data_pkt(struct sk_buff *skb) {
+    struct add_data_hdr *hdr = NULL;
     printk(KERN_INFO "add: process_data_pkt called\n");
+    hdr = skb_pull(skb, sizeof(struct add_data_hdr));
 
     if (hdr->dst_id == add_id) {
         /* we are the final destination, so send to L4! */
@@ -78,7 +82,7 @@ int process_data_pkt(struct addhdr *hdr, struct sk_buff *skb) {
     }
 }
 
-int route_packet(struct addhdr *hdr, struct sk_buff *skb) {
+int route_packet(struct add_data_hdr *hdr, struct sk_buff *skb) {
     char *daddr = NULL;
 
     daddr = lookup_next_hop(hdr->dst_id);
@@ -89,6 +93,7 @@ int route_packet(struct addhdr *hdr, struct sk_buff *skb) {
 
     /* NOTE that when we push we ALREADY have a pointer here, it's 
      * just hdr and it's already built! Just put it back as-is! */
+    skb_push(skb, sizeof(struct add_data_hdr));
     skb_push(skb, sizeof(struct addhdr));
 
     /* send down the stack! */

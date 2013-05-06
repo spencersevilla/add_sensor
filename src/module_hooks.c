@@ -11,11 +11,12 @@
 static void hello_timer(void *irrelevant);
 struct delayed_work hello_timer_dw;
 DECLARE_DELAYED_WORK(hello_timer_dw, hello_timer);
+static int closing = 0;
 
 /*******************************************************************************/
 int init_module(void) {
     printk(KERN_INFO "adding add kernel module");
-
+    closing = 0;
     add_init();
     return 0;
 }
@@ -25,17 +26,15 @@ static void hello_timer(void *irrelevant) {
 
     add_generate_hello();
 
-    if (is_controller == 1) {
+    if (closing != 1) {
 		schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);
     }
 }
 
 void cleanup_module(void) {
     printk(KERN_INFO "removing add module");
-    if (is_controller == 1) {
-        is_controller = 0;
-        cancel_delayed_work(&hello_timer_dw);
-    }
+    closing = 1;
+    cancel_delayed_work(&hello_timer_dw);
     // schedule_delayed_work(&cleanup_module_dw, CLEANUP_INTERVAL);
 }
 

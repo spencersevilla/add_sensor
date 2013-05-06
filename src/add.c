@@ -5,6 +5,7 @@ int add_id = 1;
 int is_controller = 0;
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;
+struct add_neighbor *neighbor_list_head;
 struct net_device *dev;
 
 int add_init(void) {
@@ -36,6 +37,7 @@ int add_init(void) {
     /* initialize node_list and controller_list here */
     node_list_head = NULL;
     controller_list_head = NULL;
+    neighbor_list_head = NULL;
 
     if (is_controller == 1) {
         schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);

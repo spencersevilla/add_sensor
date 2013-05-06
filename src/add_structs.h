@@ -1,10 +1,18 @@
 #ifndef _add_structs_h
 #define _add_structs_h
 
+/* structs for use in tables */
+
+struct add_neighbor {
+    int id;
+    int hops;       /* 1 or 2 */
+    char daddr[6];  /* next-hop MAC */
+};
+
 struct add_controller {
 	int id;
-	char next_hop[6];
-	int distance;
+	struct add_neighbor *next_hop;
+	int hops;
 	int seqno;
 	struct add_controller *next;
 };
@@ -22,11 +30,33 @@ struct sockaddr_add {
     char			blank[8];
 };
 
+/* structs for use in packet-headers */
+
 struct addhdr {
-    __be16 family; /* MUST BE FIRST FIELD!!! */
+    __be16 family;		/* MUST BE FIRST FIELD!!! */
     __be16 pkt_type;
+};
+
+struct add_data_hdr {
     __be32 dst_id;
     __be32 src_id;
+};
+
+struct add_hello_hdr {
+    __be32 src_id;
+    char[6] mac;
+    __be32 seqno;
+    __be16 clist;
+    __be16 nlist;
+};
+
+struct add_clist_entry {
+    __be32 id;
+    __be32 hops;
+};
+
+struct add_nlist_entry {
+    __be32 id;
 };
 
 #endif

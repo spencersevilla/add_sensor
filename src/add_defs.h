@@ -8,6 +8,7 @@ extern int add_id;
 extern struct net_device *dev;
 extern struct delayed_work hello_timer_dw;
 extern struct add_node *node_list_head;
+extern struct add_neighbor *neighbor_list_head;
 extern struct add_controller *controller_list_head;
 
 #define HELLO_INTERVAL (3*HZ)
@@ -17,6 +18,7 @@ extern struct add_controller *controller_list_head;
 
 #define AF_ADD 1
 
-#define ADD_TYPE_DATA 1
+#define ADD_TYPE_HELLO 1
+#define ADD_TYPE_DATA 2
 
 #endif

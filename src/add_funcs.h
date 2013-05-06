@@ -9,7 +9,7 @@
 
 /* add_hello.c */
 int add_generate_hello(void);
-int add_receive_hello(void);
+int add_receive_hello(struct sk_buff *skb);
 
 /* add_sendmsg.c */
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len);
@@ -28,5 +28,8 @@ struct add_node * node_from_list(int node_id);
 int insert_controller_list(struct add_controller *node);
 int remove_controller_list(int controller_id);
 struct add_controller * controller_from_list(int controller_id);
+int insert_neighbor_list(struct add_neighbor *node);
+int remove_neighbor_list(int neighbor_id);
+struct add_neighbor * neighbor_from_list(int neighbor_id);
 
 #endif
