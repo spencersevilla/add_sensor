@@ -1,7 +1,13 @@
 #include "add_includes.h"
 
+int num_controllers = 0;
+int num_neighbors = 0;
+int num_nodes = 0;
+
 int insert_node_list(struct add_node *node) {
     /* initialize list */
+    num_nodes++;
+
     struct add_node *ptr, *nxt;
     if (node_list_head == NULL) {
         node_list_head = node;
@@ -49,6 +55,7 @@ int remove_node_list(int node_id) {
     /* node is head of list */
     if (node_list_head->id == node_id) {
         node_list_head = node_list_head->next;
+        num_nodes--;
         return 0;
     }
 
@@ -57,6 +64,7 @@ int remove_node_list(int node_id) {
     while (nxt != NULL) {
         if (nxt->id == node_id) {
             ptr->next = nxt->next;
+            num_nodes--;
             return 0;
         }
 
@@ -100,6 +108,8 @@ struct add_node * node_from_list(int node_id) {
 
 int insert_controller_list(struct add_controller *node) {
     /* initialize list */
+    num_controllers++;
+
     struct add_controller *ptr, *nxt;
     if (controller_list_head == NULL) {
         controller_list_head = node;
@@ -147,6 +157,7 @@ int remove_controller_list(int node_id) {
     /* node is head of list */
     if (controller_list_head->id == node_id) {
         controller_list_head = controller_list_head->next;
+        num_controllers--;
         return 0;
     }
 
@@ -155,6 +166,7 @@ int remove_controller_list(int node_id) {
     while (nxt != NULL) {
         if (nxt->id == node_id) {
             ptr->next = nxt->next;
+            num_controllers--;
             return 0;
         }
 
@@ -198,6 +210,7 @@ struct add_controller * controller_from_list(int controller_id) {
 
 int insert_neighbor_list(struct add_neighbor *node) {
     /* initialize list */
+    num_neighbors++;
     struct add_neighbor *ptr, *nxt;
     if (neighbor_list_head == NULL) {
         neighbor_list_head = node;
@@ -245,6 +258,7 @@ int remove_neighbor_list(int node_id) {
     /* node is head of list */
     if (neighbor_list_head->id == node_id) {
         neighbor_list_head = neighbor_list_head->next;
+        num_neighbors--;
         return 0;
     }
 
@@ -253,6 +267,7 @@ int remove_neighbor_list(int node_id) {
     while (nxt != NULL) {
         if (nxt->id == node_id) {
             ptr->next = nxt->next;
+            num_neighbors--;
             return 0;
         }
 

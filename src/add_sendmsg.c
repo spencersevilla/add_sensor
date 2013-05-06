@@ -2,7 +2,7 @@
 
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len)
 {
-    struct addhdr *hdr;
+    struct add_data_hdr *hdr;
     struct net_device *dev = NULL;
     char *daddr = NULL;
     int local_id = 0;
@@ -32,11 +32,11 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     }
 
     /* build header */
-    hdr = (struct addhdr *)skb_push(skb, sizeof(struct addhdr));
+    hdr = (struct add_data_hdr *)skb_push(skb, sizeof(struct add_data_hdr));
     hdr->family = AF_ADD;
     hdr->pkt_type = ADD_TYPE_DATA;
-    // hdr->dst_id = 0;
-    // hdr->src_id = 0;
+    hdr->dst_id = 0;
+    hdr->src_id = 0;
     
     /* send down the stack! */
     return mhost_send_to_l2(skb, dev, daddr);

@@ -3,6 +3,9 @@
 int add_id = 1;
 
 int is_controller = 0;
+
+char broadcast_daddr[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;
 struct add_neighbor *neighbor_list_head;

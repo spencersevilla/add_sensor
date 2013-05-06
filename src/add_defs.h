@@ -5,6 +5,13 @@
 
 extern int is_controller;
 extern int add_id;
+
+extern int num_controllers;
+extern int num_neighbors;
+extern int num_nodes;
+
+extern char broadcast_daddr[6];
+
 extern struct net_device *dev;
 extern struct delayed_work hello_timer_dw;
 extern struct add_node *node_list_head;

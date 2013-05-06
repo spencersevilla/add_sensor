@@ -33,17 +33,16 @@ struct sockaddr_add {
 
 /* structs for use in packet-headers */
 
-struct addhdr {
-    __be16 family;		/* MUST BE FIRST FIELD!!! */
-    __be16 pkt_type;
-};
-
 struct add_data_hdr {
+    __be16 family;      /* MUST BE FIRST FIELD!!! */
+    __be16 pkt_type;
     __be32 dst_id;
     __be32 src_id;
 };
 
 struct add_hello_hdr {
+    __be16 family;      /* MUST BE FIRST FIELD!!! */
+    __be16 pkt_type;
     __be32 src_id;
     char mac[6];
     __be32 seqno;
