@@ -56,6 +56,36 @@ int add_init(void) {
     return 0;
 }
 
+/* main entry-point rcv function. this func calls the appropriate 
+ * handler based on the TYPE of add packet we're dealing with. */
+int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 
+                   struct net_device *orig_dev)
+{
+    struct add_hdr_info *hdr;
+    
+    printk(KERN_INFO "add_mhost_rcv called\n");
+    
+    /* preserve network_header location. NOTE that we never pull! */
+    hdr = (struct add_hdr_info *) skb_network_header(skb);
+    
+    // if (hdr->ones != 0xFFFF) {
+    //     printk(KERN_INFO "error: hdr->ones not all ones!\n");
+    // }
+    if (hdr->pkt_type == ADD_TYPE_DATA) {
+        return add_receive_data(skb);
+    } else if (hdr->pkt_type == ADD_TYPE_HELLO) {
+        return add_receive_hello(skb);
+    } else if (hdr->pkt_type == ADD_TYPE_REQ) {
+        return add_receive_req(skb);
+    } else if (hdr->pkt_type == ADD_TYPE_REP) {
+        return add_receive_rep(skb);
+    }
+
+    /* we received a packet-type that we don't support... */
+    printk(KERN_INFO "add error: invalid pkt_type: %d", hdr->pkt_type);
+    return -1;
+}
+
 /* the data in skb is already set and pushed! All this
  * func has to do is look up the next-hop daddr and send to l2 */
 int route_to_node(int dst_id, int dst_controller, struct sk_buff *skb) {
@@ -69,12 +99,15 @@ int route_to_node(int dst_id, int dst_controller, struct sk_buff *skb) {
         return mhost_send_to_l2(skb, dev, nxt_hop->daddr);
     }
 
-    /* STEP 2: forward to local controller's next-hop */
-    dc = controller_from_list(dst_controller);
-    if (dc != NULL) {
-        nxt_hop = dc->next_hop;
-        if (nxt_hop != NULL) {
-            return mhost_send_to_l2(skb, dev, nxt_hop->daddr);
+    /* STEP 2: forward to local controller's next-hop. Note that
+     * dst_controller == 0 indicates that we SHOULDN'T do this. */
+    if (dst_controller != 0) {
+        dc = controller_from_list(dst_controller);
+        if (dc != NULL) {
+            nxt_hop = dc->next_hop;
+            if (nxt_hop != NULL) {
+                return mhost_send_to_l2(skb, dev, nxt_hop->daddr);
+            }
         }
     }
 

@@ -2,8 +2,6 @@
 #include "mnet_includes.h"
 #include "add_includes.h"
 
-int process_data_pkt(struct sk_buff *skb);
-
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len)
 {
     struct add_data_hdr *hdr;
@@ -45,35 +43,7 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     return route_to_node(hdr->dst_id, hdr->dst_controller, skb);
 };
 
-int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 
-                   struct net_device *orig_dev)
-{
-    struct add_hdr_info *hdr;
-    
-    printk(KERN_INFO "add_mhost_rcv called\n");
-    
-    /* preserve network_header location. NOTE that we never pull! */
-    hdr = (struct add_hdr_info *) skb_network_header(skb);
-    
-    // if (hdr->ones != 0xFFFF) {
-    //     printk(KERN_INFO "error: hdr->ones not all ones!\n");
-    // }
-    if (hdr->pkt_type == ADD_TYPE_DATA) {
-        return process_data_pkt(skb);
-    } else if (hdr->pkt_type == ADD_TYPE_HELLO) {
-        return add_receive_hello(skb);
-    } else if (hdr->pkt_type == ADD_TYPE_REQ) {
-        return add_receive_req(skb);
-    } else if (hdr->pkt_type == ADD_TYPE_REP) {
-        return add_receive_rep(skb);
-    }
-
-    /* we received a packet-type that we don't support... */
-    printk(KERN_INFO "add error: invalid pkt_type: %d", hdr->pkt_type);
-    return -1;
-}
-
-int process_data_pkt(struct sk_buff *skb) {
+int add_receive_data(struct sk_buff *skb) {
     struct add_data_hdr *hdr = NULL;
     printk(KERN_INFO "add: process_data_pkt called\n");
     /* again, DON'T pull the data just yet... */
@@ -85,8 +55,19 @@ int process_data_pkt(struct sk_buff *skb) {
         skb_pull(skb, sizeof(struct add_data_hdr));
         mhost_send_to_l4(skb);
         return 0;
-    } else {
-        /* we must route it onwards... */
-        return route_to_node(hdr->dst_id, hdr->dst_controller, skb);
+    } 
+
+    /* we are the local controller for this node!
+     * mark dst_controller = 0 so we don't loop... */
+    if (hdr->dst_controller == add_id) {
+
+        if (is_controller == 0) {
+            printk(KERN_INFO "add_receive_data error: sent to controller that isn't!");
+            return -1;
+        }
+        hdr->dst_controller = 0;
     }
+
+    /* this isn't us, so we must route it onwards */
+    return route_to_node(hdr->dst_id, hdr->dst_controller, skb);
 }

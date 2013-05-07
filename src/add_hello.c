@@ -10,7 +10,7 @@ int add_generate_hello() {
   struct add_controller *c;
   struct add_neighbor *n;
   /* we don't yet know how LONG the hello packet will be, 
-   * so let's make it first and THEN copy to skb... */
+   * so let's make it first and THEN copy it to skb... */
   hdr.family = AF_ADD;
   hdr.pkt_type = ADD_TYPE_HELLO;
   hdr.src_id = add_id;

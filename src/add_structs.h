@@ -42,7 +42,7 @@ struct add_data_hdr {
     __be16 family;      /* MUST BE FIRST FIELD!!! */
     __be16 pkt_type;
     __be32 dst_id;
-    __be32 dst_controller;
+    __be32 dst_controller; /* 0 indicates already-sent */
     __be32 src_id;
 };
 
