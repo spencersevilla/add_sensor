@@ -312,3 +312,20 @@ struct add_neighbor * neighbor_from_list(int node_id) {
     /* went through the whole list, couldn't find it. */
     return NULL;
 }
+
+int num_1hop_neighbors() {
+    struct add_neighbor *ptr = NULL;
+    int count = 0;
+    
+    if (neighbor_list_head == NULL) {
+        return 0;
+    }
+
+    for(ptr = neighbor_list_head; ptr != NULL; ptr = ptr->next) {
+        if (ptr->hops == 1) {
+            count++;
+        }
+    }
+
+    return count;
+}

@@ -50,8 +50,9 @@ struct add_hello_hdr {
     __be16 family;      /* MUST BE FIRST FIELD!!! */
     __be16 pkt_type;
     __be32 src_id;
-    char mac[6];
+    __be32 is_controller;
     __be32 seqno;
+    char mac[6];
     __be16 clist;
     __be16 nlist;
 };

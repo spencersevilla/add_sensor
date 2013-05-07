@@ -11,6 +11,7 @@ extern int num_controllers;
 extern int num_neighbors;
 extern int num_nodes;
 
+extern char my_mac[6];
 extern char broadcast_daddr[6];
 
 extern struct net_device *dev;

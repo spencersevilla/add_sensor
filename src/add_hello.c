@@ -14,10 +14,11 @@ int add_generate_hello() {
   hdr.family = AF_ADD;
   hdr.pkt_type = ADD_TYPE_HELLO;
   hdr.src_id = add_id;
-  memset(hdr.mac, 0, 6);
+  hdr.is_controller = is_controller;
   hdr.seqno = 0;
+  memcpy(hdr.mac, my_mac, 6);
   hdr.clist = num_controllers;
-  hdr.nlist = num_neighbors;
+  hdr.nlist = num_1hop_neighbors();
   len += sizeof(struct add_hello_hdr);
 
   len += (hdr.clist * sizeof(struct add_clist_entry));
@@ -51,11 +52,15 @@ int add_generate_hello() {
   /* iterate through the neighbor list... */
   n = neighbor_list_head;
   while (n != NULL) {
-    struct add_nlist_entry entry;
-    entry.id = n->id;
+    /* only send direct (1-hop) neighbors */
+    if (n->hops == 1) {
+      struct add_nlist_entry entry;
+      entry.id = n->id;
 
-    memcpy(data, &entry, sizeof(struct add_nlist_entry));
-    data = data + sizeof(struct add_nlist_entry);
+      memcpy(data, &entry, sizeof(struct add_nlist_entry));
+      data = data + sizeof(struct add_nlist_entry);
+    }
+
     n = n->next;
   }
 
@@ -69,6 +74,8 @@ int add_receive_hello(struct sk_buff *skb) {
   struct add_hello_hdr *hdr = NULL;
   struct add_clist_entry *controller = NULL;
   struct add_controller *c = NULL;
+  struct add_nlist_entry *nentry = NULL;
+  struct add_neighbor *neighbor = NULL;
 
   int i = 0;
   printk(KERN_INFO "add: add_receive_hello called\n");
@@ -82,24 +89,51 @@ int add_receive_hello(struct sk_buff *skb) {
     src = kmalloc( sizeof(struct add_neighbor), GFP_KERNEL);
     src->id = hdr->src_id;
     src->hops = 1;
-    memset(src->daddr, 0, 6);
+    memcpy(src->daddr, hdr->mac, 6);
     insert_neighbor_list(src);
   } else {
-    /* now it's one hop away, even if it used to be 2! */
-    src->id = 1;
+    /* update if this used to be 2-hop neighbor */
+    if (src->hops == 2) {
+      src->hops = 1;
+      memcpy(src->daddr, hdr->mac, 6);
+    }
+  }
+
+  /* is it a controller? */
+  if (hdr->is_controller) {
+    c = controller_from_list(hdr->src_id);
+    if (c == NULL) {
+      /* we've never seen this controller before! */
+      c = kmalloc(sizeof(struct add_controller), GFP_KERNEL);
+      c->id = hdr->src_id;
+      c->hops = 1;
+      c->next_hop = src;
+      c->seqno = 0;
+      insert_controller_list(c);
+    } else {
+      /* mark that controller is one hop away */
+      c->hops = 1;
+      c->next_hop = src;
+    }
   }
 
   /* next, go through this node's controller-list
    * and update our own controller-list as necessary. */
   for (i = 0; i < hdr->clist; i++) {
     controller = (struct add_clist_entry *) skb_pull(skb, sizeof(struct add_clist_entry));
+
+    if (controller->id == add_id) {
+      /* this is just us! do nothing */
+      continue;
+    }
+
     c = controller_from_list(controller->id);
     if (c == NULL) {
       /* this is a new controller we've never seen before!!! */
-      c = kmalloc( sizeof(struct add_controller), GFP_KERNEL);
+      c = kmalloc(sizeof(struct add_controller), GFP_KERNEL);
       c->id = controller->id;
       c->next_hop = src;
-      c->hops = 2;
+      c->hops = controller->hops + 1;
       c->seqno = 0;
       insert_controller_list(c);
     } else {
@@ -112,6 +146,30 @@ int add_receive_hello(struct sk_buff *skb) {
     }
   }
 
-  /* last, do the same for the neighbor-list??? huh??? */
+  /* last, do the same for the neighbor-list */
+  for (i = 0; i < hdr->nlist; i++) {
+    nentry = (struct add_nlist_entry *) skb_pull(skb, sizeof(struct add_nlist_entry));
+
+    if (nentry->id == add_id) {
+      /* this is just us! do nothing */
+      continue;
+    }
+
+    neighbor = neighbor_from_list(nentry->id);
+    if (neighbor == NULL) {
+      /* this is a new neighbor we've never seen before!
+       * assume 2 hops and update if/when we get HELLO */
+      neighbor = kmalloc(sizeof(struct add_neighbor), GFP_KERNEL);
+      neighbor->id = nentry->id;
+      neighbor->hops = 2;
+      /* give it the src mac for now. If this becomes a 
+       * 1-hop neighbor we'll update when we get HELLO. */
+      memcpy(neighbor->daddr, src->daddr, 6);
+      insert_neighbor_list(neighbor);
+    }
+      /* NO ELSE: we already have a match, but it's at LEAST
+       * 2-hops close, so there's no benefit. Just ignore! */
+  }
+
   return 0;
 }

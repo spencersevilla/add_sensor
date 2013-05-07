@@ -2,11 +2,11 @@
 #include "mnet_includes.h"
 #include "kernel_includes.h"
 
-int add_id = 1;
+int add_id = -1;
 int local_controller_id = -1;
+int is_controller = -1;
 
-int is_controller = 0;
-
+char my_mac[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 char broadcast_daddr[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 struct add_controller *controller_list_head;
@@ -40,14 +40,18 @@ int add_init(void) {
     	return -1;
     }
 
+    /* copy MAC address over for our own reference :-) */
+    memcpy(my_mac, dev->dev_addr, 6);
+
+    if (add_id == -1 || is_controller == -1) {
+        printk(KERN_INFO "add_init error: add_id or is_controller not set!");
+        return -1;
+    }
+
     /* initialize node_list and controller_list here */
     node_list_head = NULL;
     controller_list_head = NULL;
     neighbor_list_head = NULL;
-
-    if (is_controller == 1) {
-        schedule_delayed_work(&hello_timer_dw, HELLO_INTERVAL);
-    }
 
     return 0;
 }

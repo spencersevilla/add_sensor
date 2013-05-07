@@ -34,6 +34,7 @@ struct add_controller * controller_from_list(int controller_id);
 int insert_neighbor_list(struct add_neighbor *node);
 int remove_neighbor_list(int neighbor_id);
 struct add_neighbor * neighbor_from_list(int neighbor_id);
+int num_1hop_neighbors(void);
 
 /* add_rreq.c */
 int add_generate_req(int req_id);
