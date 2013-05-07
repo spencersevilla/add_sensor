@@ -6,6 +6,5 @@
 #include "add_includes.h"
 
 int process_data_pkt(struct sk_buff *skb);
-int route_next_hop(struct add_data_hdr *hdr, struct sk_buff *skb);
 
 #endif

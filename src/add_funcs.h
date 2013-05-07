@@ -17,6 +17,9 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, struct net_device
 
 /* add.c */
 int add_init(void);
+int route_to_node(int dst_id, int dst_controller, struct sk_buff *skb);
+int route_to_controller(int cid, struct sk_buff *skb);
+
 void * lookup_next_hop(int dst_id);
 int local_controller_for_node(int node_id);
 void * next_hop_for_controller(int controller_id);
@@ -31,5 +34,10 @@ struct add_controller * controller_from_list(int controller_id);
 int insert_neighbor_list(struct add_neighbor *node);
 int remove_neighbor_list(int neighbor_id);
 struct add_neighbor * neighbor_from_list(int neighbor_id);
+
+/* add_rreq.c */
+int add_generate_req(int req_id);
+int add_receive_req(struct sk_buff *skb);
+
 
 #endif

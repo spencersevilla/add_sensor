@@ -5,6 +5,7 @@
 
 extern int is_controller;
 extern int add_id;
+extern int local_controller_id;
 
 extern int num_controllers;
 extern int num_neighbors;
@@ -27,5 +28,9 @@ extern struct add_controller *controller_list_head;
 
 #define ADD_TYPE_HELLO 1
 #define ADD_TYPE_DATA 2
+#define ADD_TYPE_REQ 3
+#define ADD_TYPE_REP 4
+#define ADD_TYPE_CONTROLLER_REQ 5
+#define ADD_TYPE_CONTROLLER_REP 6
 
 #endif

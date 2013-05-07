@@ -65,4 +65,23 @@ struct add_nlist_entry {
     __be32 id;
 };
 
+struct add_req_pkt {
+    __be16 family;          /* MUST BE FIRST FIELD!!! */
+    __be16 pkt_type;
+    __be32 dst_id;          /* anchor controller id */
+    __be32 src_id;          /* for rrep */
+    __be32 src_controller;  /* for rrep */
+    __be32 req_id;          /* the id in question */
+};
+
+struct add_rep_pkt {
+    __be16 family;          /* MUST BE FIRST FIELD!!! */
+    __be16 pkt_type;
+    __be32 dst_id;          /* requesting node id */
+    __be32 dst_controller;  /* dst node's controller */
+    __be32 src_id;
+    __be32 req_id;          /* the id in question */
+    __be32 req_controller;  /* the id's local controller */
+};
+
 #endif

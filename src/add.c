@@ -1,6 +1,7 @@
 #include "add.h"
 
 int add_id = 1;
+int local_controller_id = -1;
 
 int is_controller = 0;
 
@@ -47,6 +48,53 @@ int add_init(void) {
     }
 
     return 0;
+}
+
+/* the data in skb is already set and pushed! All this
+ * func has to do is look up the next-hop daddr and send to l2 */
+int route_to_node(int dst_id, int dst_controller, struct sk_buff *skb) {
+    struct add_neighbor *nxt_hop = NULL;
+    struct add_controller *dc = NULL;
+
+    /* STEP 1: check if the dst is within two hops, if so deliver! */
+    nxt_hop = neighbor_from_list(dst_id);
+
+    if (nxt_hop != NULL) {
+        return mhost_send_to_l2(skb, dev, nxt_hop->daddr);
+    }
+
+    /* STEP 2: forward to local controller's next-hop */
+    dc = controller_from_list(dst_controller);
+    if (dc != NULL) {
+        nxt_hop = dc->next_hop;
+        if (nxt_hop != NULL) {
+            return mhost_send_to_l2(skb, dev, nxt_hop->daddr);
+        }
+    }
+
+    /* STEP 3: no route exists to the local controller, so abort! */
+    printk(KERN_INFO "add error: cannot route next-hop for dst id %d and dst controller %d", dst_id, dst_controller);
+    return -1;
+}
+
+/* ditto for this function. */
+int route_to_controller(int cid, struct sk_buff *skb) {
+  struct add_controller *c = NULL;
+  struct add_neighbor *n = NULL;
+
+  c = controller_from_list(cid);
+  if (c == NULL) {
+    printk(KERN_INFO, "add route_to_controller error: no anchor_controller???");
+    return -1;
+  }
+
+  n = c->next_hop;
+  if (n == NULL) {
+    printk(KERN_INFO, "add route_to_controller error: no controller neighbor???");
+    return -1;
+  }
+
+  return mhost_send_to_l2(skb, dev, n->daddr);
 }
 
 /* this function takes a node_id and returns the MAC address of the
