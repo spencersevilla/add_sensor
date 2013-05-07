@@ -1,4 +1,6 @@
-#include "add.h"
+#include "add_includes.h"
+#include "mnet_includes.h"
+#include "kernel_includes.h"
 
 int add_id = 1;
 int local_controller_id = -1;

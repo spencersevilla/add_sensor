@@ -1,4 +1,5 @@
-#include "add_hello.h"
+#include "add_includes.h"
+#include "mnet_includes.h"
 
 int add_generate_hello() {
   struct sk_buff *skb;

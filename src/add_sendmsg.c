@@ -1,4 +1,8 @@
-#include "add_sendmsg.h"
+#include "kernel_includes.h"
+#include "mnet_includes.h"
+#include "add_includes.h"
+
+int process_data_pkt(struct sk_buff *skb);
 
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len)
 {
