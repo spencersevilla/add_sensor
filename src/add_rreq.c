@@ -14,7 +14,7 @@ int add_generate_req(int req_id) {
 
   anchor_controller = get_anchor_hash(req_id);
   if (anchor_controller == -1) {
-  	printk(KERN_INFO, "add error: cannot hash req_id!");
+  	printk(KERN_INFO "add error: cannot hash req_id!");
   	return -1;
   }
 

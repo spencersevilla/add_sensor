@@ -84,13 +84,13 @@ int route_to_controller(int cid, struct sk_buff *skb) {
 
   c = controller_from_list(cid);
   if (c == NULL) {
-    printk(KERN_INFO, "add route_to_controller error: no anchor_controller???");
+    printk(KERN_INFO "add route_to_controller error: no anchor_controller???");
     return -1;
   }
 
   n = c->next_hop;
   if (n == NULL) {
-    printk(KERN_INFO, "add route_to_controller error: no controller neighbor???");
+    printk(KERN_INFO "add route_to_controller error: no controller neighbor???");
     return -1;
   }
 

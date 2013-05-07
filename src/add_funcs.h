@@ -39,5 +39,7 @@ struct add_neighbor * neighbor_from_list(int neighbor_id);
 int add_generate_req(int req_id);
 int add_receive_req(struct sk_buff *skb);
 
+/* add_rrep.c */
+int add_receive_rep(struct sk_buff *skb);
 
 #endif

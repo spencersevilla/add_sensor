@@ -11,7 +11,7 @@ int add_receive_rep(struct sk_buff *skb) {
 
   /* packet detsined for us! */
   if (pkt->dst_id == add_id) {
- 	return process_rep(struct sk_buff *skb);
+ 	  return process_rep(skb);
   }
 
   /* not us, just keep on routing it! */
