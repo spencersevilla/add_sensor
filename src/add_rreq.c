@@ -44,8 +44,12 @@ int add_receive_req(struct sk_buff *skb) {
   pkt = (struct add_req_pkt *) skb_network_header(skb);
 
   if (pkt->dst_id == add_id) {
- 	printk(KERN_INFO "add error: sensor chosen as anchor controller???\n");
- 	return -1;
+    if (is_controller) {
+      return add_process_req(pkt);
+    } else {
+      printk(KERN_INFO "add error: sensor chosen as anchor controller???\n");
+      return -1;
+    }
   }
 
   /* just keep on routing it! */
