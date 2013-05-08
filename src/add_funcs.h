@@ -41,6 +41,9 @@ int num_1hop_neighbors(void);
 int add_generate_req(int req_id);
 int add_receive_req(struct sk_buff *skb);
 
+/* add_controller.c */
+int add_process_req(struct add_req_pkt *pkt);
+
 /* add_rrep.c */
 int add_receive_rep(struct sk_buff *skb);
 

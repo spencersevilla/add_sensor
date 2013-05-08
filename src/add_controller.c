@@ -30,10 +30,10 @@ int add_process_req(struct add_req_pkt *pkt) {
   }
 
   skb_reserve(skb, LL_MAX_HEADER);
-  response = skb_put(skb, len);
+  response = (struct add_rep_pkt *) skb_put(skb, len);
 
   response->family = AF_ADD;
-  repsonse->pkt_type = ADD_TYPE_REP;
+  response->pkt_type = ADD_TYPE_REP;
   response->dst_id = pkt->src_id;
   response->dst_controller = pkt->src_controller;
   response->src_id = add_id;
