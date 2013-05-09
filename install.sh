@@ -1,9 +1,8 @@
 #!/bin/bash
 
-cp include/Module.symvers src/Module.symvers
 cd src
 make
-sudo insmod add_sensor.ko
+sudo insmod add_sensor.ko add_id=1 is_controller=0
 
 mv *.o ../build/
 mv *.ko ../build/

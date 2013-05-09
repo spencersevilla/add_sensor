@@ -26,7 +26,7 @@ int add_init(void) {
     ndev = first_net_device(&init_net);
     while (ndev != NULL) {
         char *n = ndev->name;
-    	if (n[0] == 'e') {
+    	if (n[0] == 'w') {
             printk(KERN_INFO "found device: %s", ndev->name);
     		dev = ndev;
     		break;
