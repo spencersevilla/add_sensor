@@ -53,8 +53,8 @@ struct add_hello_hdr {
     __be32 is_controller;
     __be32 seqno;
     char mac[6];
-    __be16 clist;
-    __be16 nlist;
+    __be32 clist;
+    __be32 nlist;
 };
 
 struct add_clist_entry {

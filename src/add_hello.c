@@ -9,6 +9,9 @@ int add_generate_hello() {
 
   struct add_controller *c;
   struct add_neighbor *n;
+
+  return 0;
+
   /* we don't yet know how LONG the hello packet will be, 
    * so let's make it first and THEN copy it to skb... */
   hdr.family = AF_ADD;
@@ -78,13 +81,15 @@ int add_receive_hello(struct sk_buff *skb) {
   struct add_neighbor *neighbor = NULL;
 
   int i = 0;
-  printk(KERN_INFO "add: add_receive_hello called\n");
-  hdr = (struct add_hello_hdr *) skb_pull(skb, sizeof(struct add_hello_hdr));
+  // printk(KERN_INFO "add: add_receive_hello called\n");
+
+  hdr = (struct add_hello_hdr *) skb_network_header(skb);
 
   /* first, update neighbor table to reflect that the
    * node sending this message is a 1-hop neighbor! */
   src = neighbor_from_list(hdr->src_id);
   if (src == NULL) {
+    printk(KERN_INFO "add: new neighbor %d found!", hdr->src_id);
     /* we've never seen this neighbor before! */
     src = kmalloc( sizeof(struct add_neighbor), GFP_KERNEL);
     src->id = hdr->src_id;
@@ -103,6 +108,7 @@ int add_receive_hello(struct sk_buff *skb) {
   if (hdr->is_controller) {
     c = controller_from_list(hdr->src_id);
     if (c == NULL) {
+      printk(KERN_INFO "add: new controller %d found!", hdr->src_id);
       /* we've never seen this controller before! */
       c = kmalloc(sizeof(struct add_controller), GFP_KERNEL);
       c->id = hdr->src_id;
@@ -129,6 +135,7 @@ int add_receive_hello(struct sk_buff *skb) {
 
     c = controller_from_list(controller->id);
     if (c == NULL) {
+      printk(KERN_INFO "add: new controller %d found!", controller->id);
       /* this is a new controller we've never seen before!!! */
       c = kmalloc(sizeof(struct add_controller), GFP_KERNEL);
       c->id = controller->id;
@@ -146,6 +153,8 @@ int add_receive_hello(struct sk_buff *skb) {
     }
   }
 
+  return 0;
+
   /* last, do the same for the neighbor-list */
   for (i = 0; i < hdr->nlist; i++) {
     nentry = (struct add_nlist_entry *) skb_pull(skb, sizeof(struct add_nlist_entry));
@@ -159,6 +168,7 @@ int add_receive_hello(struct sk_buff *skb) {
     if (neighbor == NULL) {
       /* this is a new neighbor we've never seen before!
        * assume 2 hops and update if/when we get HELLO */
+      printk(KERN_INFO "add: new neighbor %d found!", nentry->id);
       neighbor = kmalloc(sizeof(struct add_neighbor), GFP_KERNEL);
       neighbor->id = nentry->id;
       neighbor->hops = 2;

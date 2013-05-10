@@ -9,6 +9,14 @@ int is_controller = -1;
 char my_mac[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 char broadcast_daddr[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
+struct mhost_proto mprot = {
+  .family = AF_ADD,
+  .owner = THIS_MODULE,
+  .next = NULL,
+  .sendmsg = add_mhost_sendmsg,
+  .rcv = add_mhost_rcv,
+};
+
 struct add_controller *controller_list_head;
 struct add_node *node_list_head;
 struct add_neighbor *neighbor_list_head;
@@ -52,6 +60,8 @@ int add_init(void) {
     node_list_head = NULL;
     controller_list_head = NULL;
     neighbor_list_head = NULL;
+
+    mhost_register_proto(&mprot);
 
     return 0;
 }

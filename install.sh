@@ -2,7 +2,7 @@
 
 cd src
 make
-sudo insmod add_sensor.ko add_id=1 is_controller=0
+sudo insmod add_sensor.ko add_id=2 is_controller=0
 
 mv *.o ../build/
 mv *.ko ../build/
