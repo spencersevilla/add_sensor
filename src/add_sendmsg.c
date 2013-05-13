@@ -8,6 +8,7 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     struct net_device *dev = NULL;
     int controller_id = 0;
     struct sockaddr_add *addr = (struct sockaddr_add *)sa;
+    int add_neighbor *n;
     
     printk(KERN_INFO "add_mhost_sendmsg called\n");
     
@@ -26,9 +27,15 @@ int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa,
     controller_id = local_controller_for_node(addr->id);
 
     if (controller_id == -1) {
-        /* no entry, so ABORT for now... */
-        printk(KERN_INFO "add error: no local controller for node id %d", addr->id);
-        return -1;
+        /* no local controller, but maybe its a neighbor?... */
+        n = neighbor_from_list(addr->id);
+        if (n == NULL) {
+            /* we have no leads anymore, so abort */
+            printk(KERN_INFO "add error: no routable entry!\n");
+            return -1;
+        }
+        /* we're within two hops, indicated by 0 here */
+        controller_id = 0;
     }
 
     /* build header */
