@@ -10,8 +10,6 @@ int add_generate_hello() {
   struct add_controller *c;
   struct add_neighbor *n;
 
-  return 0;
-
   /* we don't yet know how LONG the hello packet will be, 
    * so let's make it first and THEN copy it to skb... */
   hdr.family = AF_ADD;
@@ -153,8 +151,6 @@ int add_receive_hello(struct sk_buff *skb) {
     }
   }
 
-  return 0;
-
   /* last, do the same for the neighbor-list */
   for (i = 0; i < hdr->nlist; i++) {
     nentry = (struct add_nlist_entry *) skb_pull(skb, sizeof(struct add_nlist_entry));
@@ -181,5 +177,6 @@ int add_receive_hello(struct sk_buff *skb) {
        * 2-hops close, so there's no benefit. Just ignore! */
   }
 
+  skb_free(skb);
   return 0;
 }
