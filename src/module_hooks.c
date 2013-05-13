@@ -28,7 +28,7 @@ int init_module(void) {
 }
 
 static void hello_timer(void *irrelevant) {
-    printk(KERN_INFO "hello_timer fired!");
+    // printk(KERN_INFO "hello_timer fired!");
 
     add_generate_hello();
 

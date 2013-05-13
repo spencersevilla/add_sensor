@@ -1,5 +1,6 @@
 #include "add_includes.h"
 #include "mnet_includes.h"
+#include "kernel_includes.h"
 
 int add_generate_hello() {
   struct sk_buff *skb;
@@ -177,6 +178,6 @@ int add_receive_hello(struct sk_buff *skb) {
        * 2-hops close, so there's no benefit. Just ignore! */
   }
 
-  skb_free(skb);
+  kfree_skb(skb);
   return 0;
 }

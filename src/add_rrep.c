@@ -30,6 +30,6 @@ int process_rep(struct sk_buff *skb) {
   node->controller_id = pkt->req_controller;
   insert_node_list(node);
 
-  skb_free(skb);
+  kfree_skb(skb);
   return 0;
 }

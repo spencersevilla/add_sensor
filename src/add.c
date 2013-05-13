@@ -73,7 +73,7 @@ int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev,
 {
     struct add_hdr_info *hdr;
     
-    printk(KERN_INFO "add_mhost_rcv called\n");
+    // printk(KERN_INFO "add_mhost_rcv called\n");
     
     /* preserve network_header location. NOTE that we never pull! */
     hdr = (struct add_hdr_info *) skb_network_header(skb);

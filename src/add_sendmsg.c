@@ -5,21 +5,15 @@
 int add_mhost_sendmsg(struct sock *sk, struct sk_buff *skb, struct sockaddr *sa, int len)
 {
     struct add_data_hdr *hdr;
-    struct net_device *dev = NULL;
     int controller_id = 0;
     struct sockaddr_add *addr = (struct sockaddr_add *)sa;
-    int add_neighbor *n;
+    struct add_neighbor *n = NULL;
     
     printk(KERN_INFO "add_mhost_sendmsg called\n");
     
     /* do routing work to find a device */
     if (addr->sa_family != AF_ADD) {
         printk(KERN_INFO "add error: wrong sockaddr type!\n");
-        return -1;
-    }
-    
-    if (dev == NULL) {
-        printk(KERN_INFO "add error: no wlan device!\n");
         return -1;
     }
 
