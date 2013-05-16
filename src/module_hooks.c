@@ -42,11 +42,7 @@ void cleanup_module(void) {
     closing = 1;
     cancel_delayed_work(&hello_timer_dw);
     // schedule_delayed_work(&cleanup_module_dw, CLEANUP_INTERVAL);
+    return add_cleanup();
 }
-
-
-// int add_cleanup() {
-
-// }
 
 MODULE_LICENSE("GPL");

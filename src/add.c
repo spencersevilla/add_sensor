@@ -66,6 +66,14 @@ int add_init(void) {
     return 0;
 }
 
+int add_cleanup(void) {
+    mhost_unregister_proto(AF_ADD);
+
+    /* go on a big kfree-spree??? */
+
+    return 0;
+}
+
 /* main entry-point rcv function. this func calls the appropriate 
  * handler based on the TYPE of add packet we're dealing with. */
 int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 

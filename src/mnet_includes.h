@@ -25,5 +25,6 @@ struct mhost_proto {
 extern int mhost_send_to_l2(struct sk_buff *skb, struct net_device *dev, const void *daddr);
 extern int mhost_send_to_l4(struct sk_buff *skb);
 extern int mhost_register_proto(struct mhost_proto *proto);
+extern int mhost_unregister_proto(int family);
 
 #endif

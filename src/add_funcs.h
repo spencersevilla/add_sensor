@@ -17,6 +17,7 @@ int add_receive_data(struct sk_buff *skb);
 
 /* add.c */
 int add_init(void);
+int add_cleanup(void);
 int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, struct net_device *orig_dev);
 int route_to_node(int dst_id, int dst_controller, struct sk_buff *skb);
 int route_to_controller(int cid, struct sk_buff *skb);
