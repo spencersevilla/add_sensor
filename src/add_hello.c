@@ -94,6 +94,7 @@ int add_receive_hello(struct sk_buff *skb) {
     src->id = hdr->src_id;
     src->hops = 1;
     memcpy(src->daddr, hdr->mac, 6);
+    src->seen = 1;
     insert_neighbor_list(src);
   } else {
     /* update if this used to be 2-hop neighbor */
@@ -101,6 +102,7 @@ int add_receive_hello(struct sk_buff *skb) {
       src->hops = 1;
       memcpy(src->daddr, hdr->mac, 6);
     }
+    src->seen = 1;
   }
 
   /* is it a controller? */

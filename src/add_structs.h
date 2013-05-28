@@ -8,6 +8,7 @@ struct add_neighbor {
     int hops;       /* 1 or 2 */
     char daddr[6];  /* next-hop MAC */
     struct add_neighbor *next;
+    int seen;       /* received HELLO recently? */
 };
 
 struct add_controller {

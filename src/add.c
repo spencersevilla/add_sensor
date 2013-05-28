@@ -74,6 +74,29 @@ int add_cleanup(void) {
     return 0;
 }
 
+int add_table_cleanup(void) {
+    struct add_neighbor *ptr;
+
+    /* go through each neighbor and mark it as "unseen" again, 
+     * REMOVING any neighbor we haven't seen since last time! */
+    ptr = neighbor_list_head;
+    while (ptr != NULL) {
+        /* we saw the neighbor recently, so do nothing */
+        if (ptr->seen == 1) {
+            ptr->seen = 0;
+            ptr = ptr->next;
+            continue;
+        }
+
+        /* we haven't, so REMOVE the neighbor! */
+        printk(KERN_INFO "removing neighbor %d", ptr->id);
+        ptr = ptr->next;
+        continue;
+    }
+
+    return 0;
+}
+
 /* main entry-point rcv function. this func calls the appropriate 
  * handler based on the TYPE of add packet we're dealing with. */
 int add_mhost_rcv(struct sk_buff *skb, struct net_device *dev, 
